@@ -1,0 +1,6 @@
+0.002     2011-02-06 00:50:52 Europe/London
+	Fix broken dependencies from initial release (as reported by ANDK - thanks!).
+
+0.001     2011-02-01 05:10:00 Europe/London
+	Initial release to CPAN, linked to Protocol-XMPP-0.001.
+
