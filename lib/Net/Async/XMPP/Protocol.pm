@@ -113,7 +113,15 @@ sub on_read {
 
 =head2 connect
 
+ $protocol->connect(
+   on_connected => sub { warn "connected!" },
+   host         => 'talk.google.com',
+ )
+
 Establish a connection to the XMPP server.
+
+All available arguments are listed above.  C<on_connected> gets passed the
+underlying protocol object.
 
 =cut
 

@@ -18,13 +18,26 @@ version 0.002
 
 Provides XMPP client support under L<IO::Async>.
 
+This is a subclass of L<Net::Async::XMPP::Protocol>, so some of the documentation is there.
+
 See L<Protocol::XMPP> for more details on this implementation.
 
 =head1 METHODS
 
 =head2 login
 
+ $client->login(
+   host => 'talk.google.com',
+   jid  => 'foo@gmail.com',
+   password => 'blah',
+   on_connected => sub { warn "connected!" },
+ )
+
 Initiate a login with the given username and password.
+
+All available arguments are listed above.  If the client is already connected
+C<host> and C<on_connected> are ignored.  C<on_connected> gets passed the
+underlying protocol object.
 
 =cut
 
