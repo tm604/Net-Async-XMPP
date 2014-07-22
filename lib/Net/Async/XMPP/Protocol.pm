@@ -9,6 +9,7 @@ use parent qw{IO::Async::Protocol::Stream};
 use IO::Async::SSL;
 use Socket;
 use Protocol::XMPP::Stream;
+use Future::Utils 'fmap_void';
 
 =head1 NAME
 
