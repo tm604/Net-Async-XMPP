@@ -9,7 +9,7 @@ use parent qw{IO::Async::Protocol::Stream};
 use IO::Async::SSL;
 use Socket;
 use Protocol::XMPP::Stream;
-use Future::Utils 'fmap_void';
+use Future::Utils 'repeat';
 
 =head1 NAME
 
@@ -36,10 +36,10 @@ sub xmpp {
 			debug => $self->{debug} ? 1 : 0,
 			on_queued_write => $self->_capture_weakself(sub {
 				my $self = shift;
-				$self->{_writing_future} = (fmap_void {
+				$self->{_writing_future} = (repeat {
 					$self->write($self->xmpp->extract_write);
 				} while => sub { $self->xmpp->ready_to_send })->on_ready(sub {
-					$self->invoke_event('write_finished');
+					$self->invoke_event('on_write_finished');
 					delete $self->{_writing_future}
 				});
 			}),
@@ -68,6 +68,8 @@ sub configure {
 	};
 	$self->{debug} = delete $params{debug} if exists $params{debug};
 
+   $self->{on_write_finished} = $self->_replace_weakself(delete $params{on_write_finished})
+      if $params{on_write_finished};
 	foreach (qw(on_message on_roster on_contact_request on_contact on_login on_presence on_connected)) {
 		if(my $handler = delete $params{$_}) {
 			$self->xmpp->{$_} = $self->_replace_weakself($handler);
