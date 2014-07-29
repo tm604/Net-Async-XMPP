@@ -36,6 +36,7 @@ sub xmpp {
 	unless($self->{xmpp}) {
 		$self->{xmpp} = Protocol::XMPP::Stream->new(
 			debug => $self->{debug} ? 1 : 0,
+			future_factory => $self->loop->curry::weak::new_future,
 			on_queued_write => $self->_capture_weakself(sub {
 				my $self = shift;
 				$self->{_writing_future} = (repeat {
