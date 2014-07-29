@@ -12,14 +12,18 @@ GetOptions(
 	"message|m=s"     => \my $message,
 	"host|h=s"        => \my $host,
 	"password|p=s"    => \my $password,
+	"debug|d"         => \my $debug,
 ) or die "bad options";
 
 # Obtain a standard event loop
 my $loop = IO::Async::Loop->new;
 
 # Create a client object with our event callbacks
-my $client = Net::Async::XMPP::Client->new(
-); 
+$loop->add(
+	my $client = Net::Async::XMPP::Client->new(
+		debug => $debug,
+	)
+);
 
 my $presence = $loop->new_future;
 my $sender = $loop->new_future;
@@ -35,7 +39,6 @@ $client->configure(
 	},
 );
 
-$loop->add($client);
 $client->login(
 	jid	=> $jid,
 	host => $host,
