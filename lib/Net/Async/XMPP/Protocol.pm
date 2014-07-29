@@ -7,6 +7,7 @@ use warnings;
 use parent qw{IO::Async::Protocol::Stream};
 
 use IO::Async::SSL;
+use IO::Socket::SSL qw(SSL_VERIFY_NONE);
 use Socket;
 use Protocol::XMPP::Stream;
 use Future::Utils 'repeat';
@@ -92,6 +93,7 @@ sub on_starttls {
 	require IO::Async::SSLStream;
 
 	$self->SSL_upgrade(
+		SSL_verify_mode => SSL_VERIFY_NONE,
 		on_upgraded => $self->_capture_weakself(sub {
 			my ($self) = @_;
 			$self->xmpp->on_tls_complete;
