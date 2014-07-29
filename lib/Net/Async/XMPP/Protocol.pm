@@ -4,13 +4,14 @@ BEGIN {
 }
 use strict;
 use warnings;
-use parent qw{IO::Async::Protocol::Stream};
+use parent qw{IO::Async::Stream};
 
 use IO::Async::SSL;
 use IO::Socket::SSL qw(SSL_VERIFY_NONE);
 use Socket;
 use Protocol::XMPP::Stream;
 use Future::Utils 'repeat';
+use curry::weak;
 
 =head1 NAME
 
@@ -95,10 +96,11 @@ sub on_starttls {
 
 	require IO::Async::SSLStream;
 
-	$self->SSL_upgrade(
+	$self->loop->SSL_upgrade(
+		handle => $self,
 		SSL_verify_mode => SSL_VERIFY_NONE,
 		on_upgraded => $self->_capture_weakself(sub {
-			my ($self) = @_;
+			my ($self, $sock) = @_;
 			$self->xmpp->on_tls_complete;
 		}),
 		on_error => sub { die "error @_"; }
