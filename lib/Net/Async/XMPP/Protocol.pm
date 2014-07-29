@@ -38,9 +38,12 @@ sub xmpp {
 			on_queued_write => $self->_capture_weakself(sub {
 				my $self = shift;
 				$self->{_writing_future} = (repeat {
-					$self->write($self->xmpp->extract_write);
-				} while => sub { $self->xmpp->ready_to_send })->on_ready(sub {
-					$self->invoke_event('on_write_finished');
+					my $next = $self->xmpp->extract_write_and_future;
+					$self->write($next->[0])->on_ready($next->[1]);
+				} while => sub {
+					$self->xmpp->ready_to_send
+				})->on_ready(sub {
+					$self->maybe_invoke_event('on_write_finished');
 					delete $self->{_writing_future}
 				});
 			}),
