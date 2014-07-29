@@ -23,13 +23,16 @@ my $client = Net::Async::XMPP::Client->new(
 
 my $sent = $loop->new_future;
 my $write_finished = $loop->new_future;
+my $presence = $loop->new_future;
 $client->configure(
 	on_write_finished => sub {
 		warn "Had write finished event";
 		$write_finished->done unless $write_finished->is_ready;
 	},
 	on_presence => sub {
+		return if $presence->is_ready;
 		warn "Had presence";
+		$presence->done;
 		$client->compose(
 			to   => $target,
 			body => $message,
@@ -50,6 +53,8 @@ $client->login(
 );
 $sent->then(sub {
 	$write_finished
+#})->then(sub {
+#	$loop->delay_future(after => 2)
 })->get;
 $client->close;
 $loop->stop
