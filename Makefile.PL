@@ -24,7 +24,8 @@ my %WriteMakefileArgs = (
     'IO::Async::SSL' => '0.04',
     'Protocol::XMPP' => '0.002',
     'Socket' => '0',
-    'parent' => '0'
+    'parent' => '0',
+    'curry' => '0'
   },
   'VERSION' => '0.002',
   'test' => {
