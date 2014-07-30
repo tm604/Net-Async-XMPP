@@ -70,6 +70,7 @@ sub login {
 	# We have a valid connection, so prepare the login handler.
 	my $password = delete $args{password};
 	$self->xmpp->{on_login} = sub {
+		if(0) {
 		# Retrieve whatever we can find from the various features enabled
 		$self->xmpp->write_xml([
 			'iq',
@@ -100,6 +101,7 @@ sub login {
 				'xmlns' => 'jabber:iq:roster'
 			]]
 		]);
+		}
 
 # Register our presence so that the server marks us as online and tells people about us
 		$self->xmpp->write_xml([
