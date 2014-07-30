@@ -121,6 +121,7 @@ sub on_read {
 	my ($self, $buffref, $closed) = @_;
 
 	$self->xmpp->on_data($$buffref);
+	$self->xmpp->remote_closed->done if $closed && !$self->xmpp->remote_closed->is_ready;
 
 # Entire buffer is handled by the Protocol object so no need for partial processing here.
 	$$buffref = '';
