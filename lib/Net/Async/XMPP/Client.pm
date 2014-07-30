@@ -123,6 +123,13 @@ sub login {
 	};
 }
 
+sub logout {
+	my $self = shift;
+	if($self->xmpp->login_complete->is_done) {
+		return $self->xmpp->close->on_done($self->curry::close);
+	}
+}
+
 1;
 
 __END__

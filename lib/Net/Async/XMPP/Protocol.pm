@@ -153,21 +153,14 @@ sub connect {
 		socktype	=> SOCK_STREAM,
 		host		=> $host,
 		%args,
-		on_connected	=> sub {
-			my $self = shift;
-			$self->{state}{connected} = 1;
-			$self->xmpp->queue_write($_) for @{$self->xmpp->preamble};
-			$on_connected->($self) if $on_connected;
-		},
-		on_connect_error => sub {
-			# TODO Callback
-			warn "Connection error";
-		},
-		on_resolve_error => sub {
-			# TODO Callback
-			warn "Resolver error";
-		},
-	);
+	)->then(sub {
+		$self->{state}{connected} = 1;
+		$self->xmpp->queue_write($_) for @{$self->xmpp->preamble};
+		$on_connected->($self) if $on_connected;
+		$self->xmpp->login_complete;
+	})->on_fail(sub {
+		warn "Connection failure: @_";
+	})
 }
 
 # Proxy methods
