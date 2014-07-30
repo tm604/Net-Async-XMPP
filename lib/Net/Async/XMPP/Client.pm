@@ -47,10 +47,10 @@ sub login {
 
 	die "Already logged in" if $self->is_loggedin;
 
-# Establish the JabberID if we have one, since that'll affect the hostname used to connect with
+	# Establish the JabberID if we have one, since that'll affect the hostname used to connect with
 	$self->xmpp->jid(delete $args{jid}) if exists $args{jid};
 
-# If we're not connected yet, then defer the login until we've established a valid connection with the target
+	# If we're not connected yet, then defer the login until we've established a valid connection with the target
 	unless($self->is_connected) {
 		my $host = exists $args{host} ? delete($args{host}) : $self->xmpp->hostname;
 		my $on_connected = delete $args{on_connected};
