@@ -1,6 +1,7 @@
 #!/usr/bin/env perl 
 use strict;
 use warnings;
+use 5.010;
 use IO::Async::Loop;
 use Net::Async::XMPP::Client;
 
@@ -39,3 +40,5 @@ $client->login(
 })->then(sub {
 	$client->logout
 })->get;
+say "Message sent to $target.";
+
