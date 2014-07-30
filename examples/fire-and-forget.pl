@@ -25,29 +25,17 @@ $loop->add(
 	)
 );
 
-my $presence = $loop->new_future;
-my $sender = $loop->new_future;
-$client->configure(
-	on_presence => sub {
-		return if $presence->is_ready;
-		warn "Had presence";
-		$presence->done;
-		$client->compose(
-			to   => $target,
-			body => $message,
-		)->send->on_ready($sender);
-	},
-);
-
 $client->login(
-	jid	=> $jid,
-	host => $host,
-	password => $password,
-	on_connected => sub {
-		warn "Connected";
-	},
-);
-$sender->get;
-$client->close;
-$loop->stop
-
+	jid          => $jid,
+	host         => $host,
+	password     => $password,
+)->then(sub {
+	$client->compose(
+		to   => $target,
+		body => $message,
+	)->send
+}, sub {
+	warn "Something went wrong: @_";
+})->then(sub {
+	$client->logout
+})->get;
