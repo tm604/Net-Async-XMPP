@@ -70,8 +70,6 @@ sub login {
 	# We have a valid connection, so prepare the login handler.
 	my $password = delete $args{password};
 	$self->xmpp->{on_login} = sub {
-		warn "Had login\n";
-
 		# Retrieve whatever we can find from the various features enabled
 		$self->xmpp->write_xml([
 			'iq',
