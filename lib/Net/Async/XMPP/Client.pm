@@ -67,20 +67,53 @@ sub login {
 		);
 	}
 
-# We have a valid connection, so prepare the login handler.
+	# We have a valid connection, so prepare the login handler.
 	my $password = delete $args{password};
 	$self->xmpp->{on_login} = sub {
 		warn "Had login\n";
 
-# Retrieve whatever we can find from the various features enabled
-		$self->xmpp->write_xml(['iq', 'type' => 'get', id => $self->xmpp->next_id, _content => [[ 'query', 'xmlns' => 'http://jabber.org/protocol/disco#items' ]] ]);
-		$self->xmpp->write_xml(['iq', 'type' => 'get', id => $self->xmpp->next_id, _content => [[ 'query', 'xmlns' => 'http://jabber.org/protocol/disco#info' ]] ]);
+		# Retrieve whatever we can find from the various features enabled
+		$self->xmpp->write_xml([
+			'iq',
+			'type' => 'get',
+			id => $self->xmpp->next_id,
+			_content => [[
+				'query',
+				'xmlns' => 'http://jabber.org/protocol/disco#items'
+			]]
+		]);
+		$self->xmpp->write_xml([
+			'iq',
+			'type' => 'get',
+			id => $self->xmpp->next_id,
+			_content => [[
+				'query',
+				'xmlns' => 'http://jabber.org/protocol/disco#info'
+			]]
+		]);
 
-# Request the server's copy of the roster - this should generate some presence events
-		$self->xmpp->write_xml(['iq', 'type' => 'get', id => $self->xmpp->next_id, _content => [[ 'query', 'xmlns' => 'jabber:iq:roster' ]] ]);
+		# Request the server's copy of the roster - this should generate some presence events
+		$self->xmpp->write_xml([
+			'iq',
+			'type' => 'get',
+			id => $self->xmpp->next_id,
+			_content => [[
+				'query',
+				'xmlns' => 'jabber:iq:roster'
+			]]
+		]);
 
 # Register our presence so that the server marks us as online and tells people about us
-		$self->xmpp->write_xml(['presence', _content => [['priority', _content => '1' ],['show']]]);
+		$self->xmpp->write_xml([
+			'presence',
+			_content => [
+				[
+					'priority',
+					_content => '1'
+				],
+				['show']
+			]
+		]);
 	};
 
 	$self->xmpp->{on_login_ready} = sub {
