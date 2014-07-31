@@ -195,7 +195,6 @@ sub srv_lookup_resolver {
 	$resolver->getaddrinfo(
 		host     => $domain,
 		service  => $type,
-		family   => 'inet',
 		socktype => 'stream',
 	)->transform(
 		done => sub {
