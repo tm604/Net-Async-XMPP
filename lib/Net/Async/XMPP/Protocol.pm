@@ -232,8 +232,6 @@ sub srv_lookup_dns {
 			my $pkt = shift;
 			my @result;
 			foreach my $srv (grep $_->type eq 'SRV', $pkt->answer) {
-				use Data::Dumper;
-				warn Dumper($srv);
 				$self->debug_printf("Had %s:%d from %s lookup on %s", $srv->{target}->name, $srv->{port}, $type, $domain);
 				push @result, [
 					$srv->{target}->name => $srv->{port}
