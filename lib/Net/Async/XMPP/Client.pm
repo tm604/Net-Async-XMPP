@@ -52,19 +52,34 @@ sub login {
 
 	# If we're not connected yet, then defer the login until we've established a valid connection with the target
 	unless($self->is_connected) {
-		my $host = exists $args{host} ? delete($args{host}) : $self->xmpp->hostname;
+		my $f;
+		# If we had a host parameter, assume the user knows what they're up to:
+		# just connect directly to that on the given port (or 5222 if none provided)
+		if(exists $args{host}) {
+			$f = Future->wrap([
+				delete($args{host}),
+				delete($args{port}) || 5222
+			])
+		} else {
+			$f = $self->srv_lookup(
+				$self->xmpp->hostname, 'xmpp-client'
+			)
+		}
 		my $on_connected = delete $args{on_connected};
-		return $self->connect(
-			%args,
-			host		=> $host,
-			on_connected	=> $self->_capture_weakself(sub {
-				my $self = shift;
-				$on_connected->() if $on_connected;
-				$self->login(
-					%args,
-				);
-			}),
-		);
+		return $f->then(sub {
+			my $addr = shift;
+			($args{host}, $args{service}) = @$addr;
+			$self->connect(
+				%args,
+				on_connected	=> $self->_capture_weakself(sub {
+					my $self = shift;
+					$on_connected->() if $on_connected;
+					$self->login(
+						%args,
+					);
+				}),
+			);
+		});
 	}
 
 	# We have a valid connection, so prepare the login handler.

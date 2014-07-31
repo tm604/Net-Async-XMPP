@@ -147,12 +147,11 @@ sub connect {
 	my %args = @_;
 	my $on_connected = delete $args{on_connected} || $self->{on_connected};
 
-	my $host = exists $args{host} ? delete $args{host} : $self->{host};
 	$self->SUPER::connect(
-# Default port is 5222, but this can be overridden in %args.
+		# Default port is 5222, but this can be overridden in %args.
 		service		=> 5222,
 		socktype	=> SOCK_STREAM,
-		host		=> $host,
+		host		=> $self->{host},
 		%args,
 	)->then(sub {
 		$self->{state}{connected} = 1;
