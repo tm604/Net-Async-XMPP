@@ -6,12 +6,19 @@ use strict;
 use warnings;
 use parent qw{IO::Async::Stream};
 
+use IO::Async::Resolver::DNS;
 use IO::Async::SSL;
 use IO::Socket::SSL qw(SSL_VERIFY_NONE);
 use Socket qw(getnameinfo IPPROTO_TCP NI_NUMERICHOST NI_NUMERICSERV SOCK_STREAM);
 use Protocol::XMPP::Stream;
 use Future::Utils 'repeat';
 use curry::weak;
+
+# 'resolver' for regular lookup, 'dns' for DNS-specific
+# regular resolver does not appear to implement weight/priority,
+# so if you're using a service such as google.com then you'll need
+# 'dns' here.
+use constant SRV_IMPLEMENTATION => 'dns';
 
 =head1 NAME
 
@@ -177,6 +184,10 @@ order of preference.
 =cut
 
 sub srv_lookup {
+	shift->${\("srv_lookup_" . SRV_IMPLEMENTATION)}(@_);
+}
+
+sub srv_lookup_resolver {
 	my ($self, $domain, $type) = @_;
 	my $resolver = $self->loop->resolver;
 	$type //= 'xmpp-client';
@@ -199,6 +210,35 @@ sub srv_lookup {
 						"socket(%d,%d,%d) + connect('%v02x')",
 						@{$addr}{qw( family socktype protocol addr )});
 				}
+			}
+			return @result;
+		}
+	)
+}
+
+sub srv_lookup_dns {
+	my ($self, $domain, $type) = @_;
+	my $resolver = $self->loop->resolver;
+	$type //= 'xmpp-client';
+
+	my $f = $self->loop->new_future;
+	$resolver->res_query(
+		dname    => "_${type}._tcp.$domain",
+		type     => 'SRV',
+		on_resolved => sub { $f->done(@_) },
+		on_error => sub { $f->fail(@_) },
+	);
+	$f->transform(
+		done => sub {
+			my $pkt = shift;
+			my @result;
+			foreach my $srv (grep $_->type eq 'SRV', $pkt->answer) {
+				use Data::Dumper;
+				warn Dumper($srv);
+				$self->debug_printf("Had %s:%d from %s lookup on %s", $srv->{target}->name, $srv->{port}, $type, $domain);
+				push @result, [
+					$srv->{target}->name => $srv->{port}
+				];
 			}
 			return @result;
 		}
