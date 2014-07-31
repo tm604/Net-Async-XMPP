@@ -8,7 +8,7 @@ use parent qw{IO::Async::Stream};
 
 use IO::Async::SSL;
 use IO::Socket::SSL qw(SSL_VERIFY_NONE);
-use Socket;
+use Socket qw(getnameinfo IPPROTO_TCP NI_NUMERICHOST NI_NUMERICSERV SOCK_STREAM);
 use Protocol::XMPP::Stream;
 use Future::Utils 'repeat';
 use curry::weak;
@@ -162,6 +162,48 @@ sub connect {
 	})->on_fail(sub {
 		warn "Connection failure: @_";
 	})
+}
+
+=head2 srv_lookup
+
+Performs a SRV lookup for the given domain and type.
+
+This should resolve to a list of (host, port) arrayrefs, in decreasing
+order of preference.
+
+ $proto->srv_lookup('example.com', 'xmpp-client')->on_done(sub {
+  printf "Service available at %s:%d\n", @$_ for @_;
+ });
+
+=cut
+
+sub srv_lookup {
+	my ($self, $domain, $type) = @_;
+	my $resolver = $self->loop->resolver;
+	$type //= 'xmpp-client';
+
+	$resolver->getaddrinfo(
+		host     => $domain,
+		service  => $type,
+		family   => 'inet',
+		socktype => 'stream',
+	)->transform(
+		done => sub {
+			my @result;
+			foreach my $addr (@_) {
+				if($addr->{protocol} == IPPROTO_TCP) {
+					my ($err, $host, $port) = getnameinfo $addr->{addr}, NI_NUMERICHOST | NI_NUMERICSERV;
+					$self->debug_printf("Had %s:%d from %s lookup on %s, error status %d", $host, $port, $type, $domain, $err);
+					push @result, [ $host => $port ];
+				} else {
+					$self->debug_printf("$type for $domain can be reached at " .
+						"socket(%d,%d,%d) + connect('%v02x')",
+						@{$addr}{qw( family socktype protocol addr )});
+				}
+			}
+			return @result;
+		}
+	)
 }
 
 # Proxy methods
