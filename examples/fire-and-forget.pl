@@ -28,7 +28,10 @@ $loop->add(
 
 $client->login(
 	jid          => $jid,
-	host         => $host,
+	(defined $host
+	? (host         => $host)
+	: ()
+	),
 	password     => $password,
 )->then(sub {
 	$client->compose(
