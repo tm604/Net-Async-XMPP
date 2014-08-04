@@ -4,6 +4,14 @@ use strict;
 use warnings;
 use parent qw{IO::Async::Stream};
 
+=head1 NAME
+
+Net::Async::XMPP::Protocol - common protocol support for L<Net::Async::XMPP>
+
+=head1 METHODS
+
+=cut
+
 use IO::Async::Resolver::DNS;
 use IO::Async::SSL;
 use IO::Socket::SSL qw(SSL_VERIFY_NONE);
@@ -17,18 +25,6 @@ use curry::weak;
 # so if you're using a service such as google.com then you'll need
 # 'dns' here.
 use constant SRV_IMPLEMENTATION => 'dns';
-
-=head1 NAME
-
-Net::Async::XMPP::Protocol - common protocol support for L<Net::Async::XMPP>
-
-=head1 VERSION
-
-version 0.002
-
-=head1 METHODS
-
-=cut
 
 =head2 xmpp
 
