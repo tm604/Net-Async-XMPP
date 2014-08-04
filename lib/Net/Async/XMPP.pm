@@ -44,7 +44,7 @@ version 0.002
 	jid	=> 'user@example.com',
 	password => $ENV{NET_ASYNC_XMPP_PASSWORD},
  );
- $loop->loop_forever;
+ $loop->run;
 
 =head1 DESCRIPTION
 
