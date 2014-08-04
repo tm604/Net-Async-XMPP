@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.003     2014-08-04 19:27:46+01:00 Europe/London
 	New features:
 	* Most of the public API methods now use Futures to indicate completion
 	* SRV lookup - needs DNS although an optional constant allows getnameinfo
