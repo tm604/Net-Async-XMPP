@@ -54,7 +54,7 @@ sub xmpp {
 				my $self = shift;
 				$self->on_starttls;
 			}),
-		); 
+		);
 	}
 	return $self->{xmpp};
 }

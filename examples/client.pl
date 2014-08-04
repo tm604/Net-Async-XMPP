@@ -9,7 +9,7 @@ print "Had $loop\n";
 
 my $client = Net::Async::XMPP::Client->new(
 	debug => 1
-); 
+);
 $loop->add($client);
 
 $client->connect(

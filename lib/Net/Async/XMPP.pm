@@ -38,7 +38,7 @@ version 0.002
 		my ($client, $contact) = @_;
 		warn "Had a presence update from " . $contact->jid;
 	},
- ); 
+ );
  $loop->add($client);
  $client->login(
 	jid	=> 'user@example.com',

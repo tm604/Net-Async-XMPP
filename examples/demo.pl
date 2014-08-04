@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use IO::Async::Loop;
@@ -27,7 +27,7 @@ my $client = Net::Async::XMPP::Client->new(
 		my ($client, $contact) = @_;
 		warn "Had a presence update from " . $contact->jid;
 	},
-); 
+);
 $loop->add($client);
 $client->login(
 	jid	=> 'xmpptest@roku',

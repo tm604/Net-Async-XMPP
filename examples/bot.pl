@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use IO::Async::Loop;
@@ -48,7 +48,7 @@ my %command_map; %command_map = (
 
 # Create a client object with our event callbacks
 my $client = Net::Async::XMPP::Client->new(
-# Called when a message is received. 
+# Called when a message is received.
 	on_message		=> sub {
 		my ($client, $msg) = @_;
 		# Don't attempt to send anything if it was from us, to avoid loops
@@ -82,7 +82,7 @@ my $client = Net::Async::XMPP::Client->new(
 			body => "Hi " . $contact->name . ", type help to get started.",
 		)->send;
 	},
-); 
+);
 
 $loop->add($client);
 $client->login(
